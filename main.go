@@ -40,7 +40,7 @@ func main() {
 
 	_, err = builder.ControllerManagedBy(mgr).
 		For(&appsv1.DaemonSet{}).
-		Build(&ctl.DaemonsetReconciler{Client: mgr.GetClient(), Log: logf.Log.WithName("deployment-controller")})
+		Build(&ctl.DaemonsetReconciler{Client: mgr.GetClient(), Log: logf.Log.WithName("deployment-controller"), Repository: docker})
 
 	if err != nil {
 		log.Error(err, "could not create daemonset controller")
