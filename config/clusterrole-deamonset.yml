@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: daemonset-controller
+rules:
+  - apiGroups: ["extensions", "apps"]
+    resources: ["daemonsets"]
+    verbs: ["get", "list", "watch", "update"]

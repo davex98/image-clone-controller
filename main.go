@@ -24,14 +24,12 @@ func main() {
 	}
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
-	os.Setenv("DOCKER_REPO", "jakuburghardt")
 	docker := repository.NewRepository()
 
 	_, err = builder.
 		ControllerManagedBy(mgr).
 		For(&appsv1.Deployment{}).
 		Build(&ctl.DeploymentReconciler{Client: mgr.GetClient(), Log: logf.Log.WithName("deployment-controller"), Repository: docker})
-
 
 	if err != nil {
 		log.Error(err, "could not create deployment controller")
@@ -40,7 +38,7 @@ func main() {
 
 	_, err = builder.ControllerManagedBy(mgr).
 		For(&appsv1.DaemonSet{}).
-		Build(&ctl.DaemonsetReconciler{Client: mgr.GetClient(), Log: logf.Log.WithName("deployment-controller"), Repository: docker})
+		Build(&ctl.DaemonsetReconciler{Client: mgr.GetClient(), Log: logf.Log.WithName("daemonset-controller"), Repository: docker})
 
 	if err != nil {
 		log.Error(err, "could not create daemonset controller")

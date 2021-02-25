@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: image-clone
+  labels:
+    app: image-clone-controller
+  name: image-clone-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-clone-controller
+  template:
+    metadata:
+      labels:
+        app: image-clone-controller
+    spec:
+      serviceAccountName: image-clone
+      containers:
+      - image: burghardtkubermatic/image-clone-controller:v1
+        name: image-clone-controller
+        volumeMounts:
+          - name: dockerconfig
+            mountPath: "docker/secret"
+            readOnly: true
+        envFrom:
+          - configMapRef:
+              name: dockerrepo
+        env:
+          - name: DOCKER_CONFIG
+            value: "/docker/secret"
+      volumes:
+        - name: dockerconfig
+          secret:
+            secretName: dockercredentials
+
