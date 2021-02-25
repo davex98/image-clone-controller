@@ -6,7 +6,6 @@ import (
 	"github.com/davex98/image-clone-controller/repository"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -68,23 +67,6 @@ func (d *DeploymentReconciler) Reconcile(ctx context.Context, request reconcile.
 	return reconcile.Result{}, nil
 }
 
-func doesNotExistError(err error) bool {
-	if statusError, ok := err.(*k8serrors.StatusError); ok {
-		if statusError.ErrStatus.Code == 404 {
-			return true
-		}
-	}
-	return false
-}
-
-func hasBeenModifiedError(err error) bool {
-	if statusError, ok := err.(*k8serrors.StatusError); ok {
-		if statusError.ErrStatus.Code == 409 {
-			return true
-		}
-	}
-	return false
-}
 
 var _ reconcile.Reconciler = &DeploymentReconciler{}
 
