@@ -31,8 +31,8 @@ func (d *DaemonsetReconciler) Reconcile(ctx context.Context, request reconcile.R
 		return reconcile.Result{}, err
 	}
 
-	daeomonSpecCopy := daemon.Spec.Template.Spec.DeepCopy()
-	for i, container := range daemon.Spec.Template.Spec.Containers {
+	deepCopy := daemon.DeepCopy()
+	for i, container := range deepCopy.Spec.Template.Spec.Containers {
 		currentImage := container.Image
 		if valid := d.Repository.IsImageValid(currentImage); valid {
 			continue
@@ -48,11 +48,10 @@ func (d *DaemonsetReconciler) Reconcile(ctx context.Context, request reconcile.R
 			d.Log.Error(err, "could not push image to private repo")
 			return reconcile.Result{}, err
 		}
-		daeomonSpecCopy.Containers[i].Image = newImage.GetName()
+		deepCopy.Spec.Template.Spec.Containers[i].Image = newImage.GetName()
 	}
-	daemonCopy := daemon.DeepCopy()
-	daemonCopy.Spec.Template.Spec = *daeomonSpecCopy
-	err = d.Update(ctx, daemonCopy, &client.UpdateOptions{})
+
+	err = d.Update(ctx, deepCopy, &client.UpdateOptions{})
 	if err != nil {
 		if hasBeenModifiedError(err) {
 			d.Log.Info("the object has been modified; please apply your changes to the latest version and try again")
@@ -61,7 +60,7 @@ func (d *DaemonsetReconciler) Reconcile(ctx context.Context, request reconcile.R
 		d.Log.Error(err, "could not update daemonset image")
 		return reconcile.Result{}, err
 	}
-	d.Log.Info(fmt.Sprintf("daemonset %s has valid images", daemonCopy.Name))
+	d.Log.Info(fmt.Sprintf("daemonset %s has valid images", deepCopy.Name))
 	return reconcile.Result{}, nil
 
 }

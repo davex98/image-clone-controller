@@ -33,8 +33,8 @@ func (d *DeploymentReconciler) Reconcile(ctx context.Context, request reconcile.
 		return reconcile.Result{}, err
 	}
 
-	depSpecCopy := dep.Spec.Template.Spec.DeepCopy()
-	for i, container := range dep.Spec.Template.Spec.Containers {
+	deepCopy := dep.DeepCopy()
+	for i, container := range deepCopy.Spec.Template.Spec.Containers {
 		currentImage := container.Image
 		if valid := d.Repository.IsImageValid(currentImage); valid {
 			continue
@@ -50,11 +50,10 @@ func (d *DeploymentReconciler) Reconcile(ctx context.Context, request reconcile.
 			d.Log.Error(err, "could not push image to private repo")
 			return reconcile.Result{}, err
 		}
-		depSpecCopy.Containers[i].Image = newImage.GetName()
+		deepCopy.Spec.Template.Spec.Containers[i].Image = newImage.GetName()
 	}
-	depCopy := dep.DeepCopy()
-	depCopy.Spec.Template.Spec = *depSpecCopy
-	err = d.Update(ctx, depCopy, &client.UpdateOptions{})
+
+	err = d.Update(ctx, deepCopy, &client.UpdateOptions{})
 	if err != nil {
 		if hasBeenModifiedError(err) {
 			d.Log.Info("the object has been modified; please apply your changes to the latest version and try again")
@@ -63,7 +62,7 @@ func (d *DeploymentReconciler) Reconcile(ctx context.Context, request reconcile.
 		d.Log.Error(err, "could not update deployment image")
 		return reconcile.Result{}, err
 	}
-	d.Log.Info(fmt.Sprintf("deployment %s has valid images", depCopy.Name))
+	d.Log.Info(fmt.Sprintf("deployment %s has valid images", deepCopy.Name))
 	return reconcile.Result{}, nil
 }
 

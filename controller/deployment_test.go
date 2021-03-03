@@ -83,17 +83,8 @@ var _ = Describe("Deployment controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, deployment)).Should(Succeed())
 
-
 			deploymentLookupKey := types.NamespacedName{Name: "kubermatic", Namespace: DeploymentNamespace}
 			createdDeployment := &appsv1.Deployment{}
-
-			Eventually(func() bool {
-				err := k8sClient.Get(ctx, deploymentLookupKey, createdDeployment)
-				if err != nil {
-					return false
-				}
-				return true
-			}, timeout, interval).Should(BeTrue())
 
 			Eventually(func() string {
 				err := k8sClient.Get(ctx, deploymentLookupKey, createdDeployment)

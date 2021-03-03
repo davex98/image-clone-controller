@@ -46,7 +46,6 @@ var _ = Describe("Daemonset controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, daemonset)).Should(Succeed())
 
-
 			daemonLookupKey := types.NamespacedName{Name: DaemonName, Namespace: DaemonNamespace}
 			createdDaemon := &appsv1.DaemonSet{}
 
@@ -83,17 +82,8 @@ var _ = Describe("Daemonset controller", func() {
 			}
 			Expect(k8sClient.Create(ctx, daemonset)).Should(Succeed())
 
-
 			daemonLookupKey := types.NamespacedName{Name: "kubermatic", Namespace: DaemonNamespace}
 			createdDaemon := &appsv1.DaemonSet{}
-
-			Eventually(func() bool {
-				err := k8sClient.Get(ctx, daemonLookupKey, createdDaemon)
-				if err != nil {
-					return false
-				}
-				return true
-			}, timeout, interval).Should(BeTrue())
 
 			Eventually(func() string {
 				err := k8sClient.Get(ctx, daemonLookupKey, createdDaemon)
