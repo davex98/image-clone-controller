@@ -19,3 +19,6 @@ deploy_app:
 	kubectl apply -f config/crb-deployment.yml
 	kubectl apply -f config/dockersecret.yml
 	kubectl apply -f config/image-clone-deployment.yml
+
+test:
+	go test ./...
