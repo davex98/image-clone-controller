@@ -6,6 +6,7 @@ import (
 	"github.com/davex98/image-clone-controller/repository"
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -24,7 +25,7 @@ func (d *DaemonsetReconciler) Reconcile(ctx context.Context, request reconcile.R
 	}
 	err := d.Get(ctx, request.NamespacedName, daemon)
 	if err != nil {
-		if doesNotExistError(err) {
+		if errors.IsNotFound(err) {
 			d.Log.Info("the object does not exist anymore")
 			return reconcile.Result{}, nil
 		}
@@ -53,7 +54,7 @@ func (d *DaemonsetReconciler) Reconcile(ctx context.Context, request reconcile.R
 
 	err = d.Update(ctx, deepCopy, &client.UpdateOptions{})
 	if err != nil {
-		if hasBeenModifiedError(err) {
+		if errors.IsAlreadyExists(err) {
 			d.Log.Info("the object has been modified; please apply your changes to the latest version and try again")
 			return reconcile.Result{}, nil
 		}

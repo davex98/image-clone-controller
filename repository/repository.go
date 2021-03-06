@@ -64,7 +64,7 @@ func (r repository) PushImageToPrivateRepo(newImage image) (image, error) {
 func NewRepository() Docker {
 	getenv := os.Getenv("DOCKER_REPO")
 	if getenv == "" {
-		panic("pass DOKCER_REPO variable")
+		panic("pass DOCKER_REPO variable")
 	}
 
 	return repository{repoName: getenv}
